@@ -52,14 +52,25 @@ class CampaignService:
         return re.sub(r"\{\{\s*([a-zA-Z0-9_]+)\s*\}\}", replace_var, template_str)
 
     @staticmethod
-    def process_campaign_sequential(db: Session, campaign_id: str):
-        campaign = db.query(EmailCampaign).filter(EmailCampaign.id == campaign_id).first()
-        if not campaign:
-            return
+    def process_campaign_sequential(campaign_id_or_db, second_arg=None):
+        from app.core.database import SessionLocal
+        own_session = False
+        if isinstance(campaign_id_or_db, str):
+            campaign_id = campaign_id_or_db
+            db = second_arg or SessionLocal()
+            if second_arg is None:
+                own_session = True
+        else:
+            db = campaign_id_or_db
+            campaign_id = second_arg
+        try:
+            campaign = db.query(EmailCampaign).filter(EmailCampaign.id == campaign_id).first()
+            if not campaign:
+                return
 
-        campaign.status = "Sending"
-        campaign.started_at = datetime.utcnow()
-        db.commit()
+            campaign.status = "Sending"
+            campaign.started_at = datetime.utcnow()
+            db.commit()
 
         # Retrieve sender google account refresh token and email
         sender_account = None
@@ -182,8 +193,16 @@ class CampaignService:
                 campaign.status = "Completed With Errors"
             else:
                 campaign.status = "Completed"
-        
-        db.commit()
+
+            db.commit()
+        except Exception as e:
+            if db:
+                db.rollback()
+            import logging
+            logging.getLogger(__name__).exception(f"[Campaign {campaign_id}] Execution error: {e}")
+        finally:
+            if own_session and db:
+                db.close()
 
     @staticmethod
     def retry_single_recipient(db: Session, recipient_id: str) -> bool:

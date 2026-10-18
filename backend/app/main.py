@@ -65,39 +65,6 @@ def startup_db_seed():
 
     db = SessionLocal()
     try:
-        # Check if default demo user exists
-        user_count = db.query(User).count()
-        if user_count == 0:
-            demo_user = User(
-                name="Namrata Pandey",
-                email="namratapandey2327@gmail.com",
-                hashed_password=hash_password("reacher123"),
-                role="Senior Vendor Procurement Lead",
-                company_name="Rapid Conect"
-            )
-            db.add(demo_user)
-
-            demo_recruiter = User(
-                name="Demo Recruiter",
-                email="recruiter.demo@gmail.com",
-                hashed_password=hash_password("reacher123"),
-                role="Senior Technical Recruiter",
-                company_name="Rapid Conect"
-            )
-            db.add(demo_recruiter)
-            db.commit()
-
-            # Connect demo Google account
-            google_acc = GoogleAccount(
-                user_id=demo_user.id,
-                google_email="namratapandey2327@gmail.com",
-                google_subject_id="demo_sub_9988",
-                encrypted_refresh_token="mock_encrypted_refresh_token",
-                status="connected"
-            )
-            db.add(google_acc)
-            db.commit()
-
         # Seed sample templates if empty
         template_count = db.query(EmailTemplate).count()
         if template_count == 0:

@@ -164,8 +164,8 @@ def start_campaign(
     campaign.status = "Queued"
     db.commit()
 
-    # Launch sequential sending engine in background task
-    background_tasks.add_task(CampaignService.process_campaign_sequential, db, campaign_id)
+    # Launch sequential sending engine in background task with dedicated session
+    background_tasks.add_task(CampaignService.process_campaign_sequential, campaign_id)
     return {"message": "Campaign queued and background sequential sending started", "campaign_id": campaign_id}
 
 @router.post("/{campaign_id}/cancel")

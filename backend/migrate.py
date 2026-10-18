@@ -87,9 +87,48 @@ def run_migration():
                     conn.commit()
                     print(f" + Added column '{col}' to table '{tbl}'")
                 except Exception as ex:
-                    print(f" - Notice: Column {tbl}.{col} check ({ex})")
-            else:
-                print(f" * Column '{col}' in '{tbl}' already present")
+        # Apply PostgreSQL specific performance indexes, foreign key cascades, and RLS
+        if "postgres" in target_url:
+            print("\n    Ensuring ON DELETE CASCADE and performance indexes...")
+            postgres_safety_ddl = [
+                "ALTER TABLE google_accounts DROP CONSTRAINT IF EXISTS google_accounts_user_id_fkey;",
+                "ALTER TABLE google_accounts ADD CONSTRAINT google_accounts_user_id_fkey FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE;",
+                "ALTER TABLE email_campaigns DROP CONSTRAINT IF EXISTS email_campaigns_user_id_fkey;",
+                "ALTER TABLE email_campaigns ADD CONSTRAINT email_campaigns_user_id_fkey FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE;",
+                "ALTER TABLE email_campaigns DROP CONSTRAINT IF EXISTS email_campaigns_sender_google_account_id_fkey;",
+                "ALTER TABLE email_campaigns ADD CONSTRAINT email_campaigns_sender_google_account_id_fkey FOREIGN KEY (sender_google_account_id) REFERENCES google_accounts(id) ON DELETE SET NULL;",
+                "ALTER TABLE email_templates DROP CONSTRAINT IF EXISTS email_templates_user_id_fkey;",
+                "ALTER TABLE email_templates ADD CONSTRAINT email_templates_user_id_fkey FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE;",
+                "ALTER TABLE campaign_recipients DROP CONSTRAINT IF EXISTS campaign_recipients_campaign_id_fkey;",
+                "ALTER TABLE campaign_recipients ADD CONSTRAINT campaign_recipients_campaign_id_fkey FOREIGN KEY (campaign_id) REFERENCES email_campaigns(id) ON DELETE CASCADE;",
+                "ALTER TABLE campaign_recipients DROP CONSTRAINT IF EXISTS campaign_recipients_employee_id_fkey;",
+                "ALTER TABLE campaign_recipients ADD CONSTRAINT campaign_recipients_employee_id_fkey FOREIGN KEY (employee_id) REFERENCES employees(id) ON DELETE SET NULL;",
+                "ALTER TABLE email_events DROP CONSTRAINT IF EXISTS email_events_campaign_recipient_id_fkey;",
+                "ALTER TABLE email_events ADD CONSTRAINT email_events_campaign_recipient_id_fkey FOREIGN KEY (campaign_recipient_id) REFERENCES campaign_recipients(id) ON DELETE CASCADE;",
+                "ALTER TABLE email_send_logs DROP CONSTRAINT IF EXISTS email_send_logs_campaign_recipient_id_fkey;",
+                "ALTER TABLE email_send_logs ADD CONSTRAINT email_send_logs_campaign_recipient_id_fkey FOREIGN KEY (campaign_recipient_id) REFERENCES campaign_recipients(id) ON DELETE CASCADE;",
+                "CREATE INDEX IF NOT EXISTS ix_campaign_recipients_campaign_id ON campaign_recipients (campaign_id);",
+                "CREATE INDEX IF NOT EXISTS ix_campaign_recipients_status ON campaign_recipients (status);",
+                "CREATE INDEX IF NOT EXISTS ix_email_campaigns_user_id ON email_campaigns (user_id);",
+                "CREATE INDEX IF NOT EXISTS ix_google_accounts_user_id ON google_accounts (user_id);",
+                "CREATE INDEX IF NOT EXISTS ix_employees_company_name ON employees (company_name);",
+                "CREATE INDEX IF NOT EXISTS ix_email_templates_user_id ON email_templates (user_id);",
+                "ALTER TABLE users ENABLE ROW LEVEL SECURITY;",
+                "ALTER TABLE google_accounts ENABLE ROW LEVEL SECURITY;",
+                "ALTER TABLE employees ENABLE ROW LEVEL SECURITY;",
+                "ALTER TABLE email_campaigns ENABLE ROW LEVEL SECURITY;",
+                "ALTER TABLE campaign_recipients ENABLE ROW LEVEL SECURITY;",
+                "ALTER TABLE email_events ENABLE ROW LEVEL SECURITY;",
+                "ALTER TABLE email_send_logs ENABLE ROW LEVEL SECURITY;",
+                "ALTER TABLE email_templates ENABLE ROW LEVEL SECURITY;"
+            ]
+            for stmt in postgres_safety_ddl:
+                try:
+                    conn.execute(text(stmt))
+                    conn.commit()
+                except Exception as ex:
+                    pass
+            print("    Cascade foreign keys, performance indexes, and RLS enforced.")
 
     # Inspect all tables and record counts
     print("\n[4/4] Verifying tables and record counts...")

@@ -31,7 +31,7 @@ class GoogleAccount(Base):
     __tablename__ = "google_accounts"
 
     id = Column(String, primary_key=True, default=generate_uuid)
-    user_id = Column(String, ForeignKey("users.id"), nullable=False)
+    user_id = Column(String, ForeignKey("users.id", ondelete="CASCADE"), nullable=False)
     google_email = Column(String, nullable=False)
     google_subject_id = Column(String, nullable=True)
     encrypted_refresh_token = Column(Text, nullable=True)
@@ -65,8 +65,8 @@ class EmailCampaign(Base):
     __tablename__ = "email_campaigns"
 
     id = Column(String, primary_key=True, default=generate_uuid)
-    user_id = Column(String, ForeignKey("users.id"), nullable=False)
-    sender_google_account_id = Column(String, ForeignKey("google_accounts.id"), nullable=True)
+    user_id = Column(String, ForeignKey("users.id", ondelete="CASCADE"), nullable=False)
+    sender_google_account_id = Column(String, ForeignKey("google_accounts.id", ondelete="SET NULL"), nullable=True)
     subject = Column(String, nullable=False)
     body = Column(Text, nullable=False)
     cc_recipients = Column(Text, nullable=True)  # comma separated or json
@@ -86,8 +86,8 @@ class CampaignRecipient(Base):
     __tablename__ = "campaign_recipients"
 
     id = Column(String, primary_key=True, default=generate_uuid)
-    campaign_id = Column(String, ForeignKey("email_campaigns.id"), nullable=False)
-    employee_id = Column(String, ForeignKey("employees.id"), nullable=True)
+    campaign_id = Column(String, ForeignKey("email_campaigns.id", ondelete="CASCADE"), nullable=False)
+    employee_id = Column(String, ForeignKey("employees.id", ondelete="SET NULL"), nullable=True)
     recipient_email = Column(String, nullable=False)
     personalized_subject = Column(String, nullable=True)
     personalized_body = Column(Text, nullable=True)
@@ -106,7 +106,7 @@ class EmailEvent(Base):
     __tablename__ = "email_events"
 
     id = Column(String, primary_key=True, default=generate_uuid)
-    campaign_recipient_id = Column(String, ForeignKey("campaign_recipients.id"), nullable=False)
+    campaign_recipient_id = Column(String, ForeignKey("campaign_recipients.id", ondelete="CASCADE"), nullable=False)
     event_type = Column(String, nullable=False)  # sent, delivered, opened, bounced, failed
     payload = Column(Text, nullable=True)
     created_at = Column(DateTime, default=datetime.utcnow)
@@ -118,7 +118,7 @@ class EmailSendLog(Base):
     __tablename__ = "email_send_logs"
 
     id = Column(String, primary_key=True, default=generate_uuid)
-    campaign_recipient_id = Column(String, ForeignKey("campaign_recipients.id"), nullable=False)
+    campaign_recipient_id = Column(String, ForeignKey("campaign_recipients.id", ondelete="CASCADE"), nullable=False)
     provider = Column(String, default="Gmail API")
     provider_message_id = Column(String, nullable=True)
     request_status = Column(String, nullable=True)
@@ -133,7 +133,7 @@ class EmailTemplate(Base):
     __tablename__ = "email_templates"
 
     id = Column(String, primary_key=True, default=generate_uuid)
-    user_id = Column(String, ForeignKey("users.id"), nullable=True)
+    user_id = Column(String, ForeignKey("users.id", ondelete="CASCADE"), nullable=True)
     name = Column(String, nullable=False)
     category = Column(String, default="General Outreach")
     subject = Column(String, nullable=False)
