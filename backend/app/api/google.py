@@ -41,12 +41,28 @@ def get_google_status(current_user: User = Depends(get_current_user), db: Sessio
     }
 
 def get_request_redirect_uri(request: Request) -> str:
-    # If explicitly configured in production without localhost, honor it
-    if settings.GOOGLE_REDIRECT_URI and "localhost" not in settings.GOOGLE_REDIRECT_URI:
-        return settings.GOOGLE_REDIRECT_URI
+    # 1. On Vercel cloud deployment
+    import os
+    vercel_host = os.getenv("VERCEL_PROJECT_PRODUCTION_URL") or os.getenv("VERCEL_URL")
+    if vercel_host:
+        return f"https://{vercel_host}/api/google/callback"
 
-    # Infer from incoming request headers
-    host = request.headers.get("x-forwarded-host") or request.headers.get("host") or "rapid-conect.vercel.app"
+    forwarded_host = request.headers.get("x-forwarded-host")
+    if forwarded_host and "vercel.app" in forwarded_host:
+        proto = request.headers.get("x-forwarded-proto", "https")
+        return f"{proto}://{forwarded_host}/api/google/callback"
+
+    # 2. If explicitly configured in settings, use it
+    if settings.GOOGLE_REDIRECT_URI:
+        uri = settings.GOOGLE_REDIRECT_URI
+        if "127.0.0.1" in uri:
+            uri = uri.replace("127.0.0.1", "localhost")
+        return uri
+
+    # 3. Infer from incoming request host (normalizing 127.0.0.1 to localhost)
+    host = request.headers.get("x-forwarded-host") or request.headers.get("host") or "localhost:8000"
+    if "127.0.0.1" in host:
+        host = host.replace("127.0.0.1", "localhost")
     proto = request.headers.get("x-forwarded-proto", "https" if "vercel.app" in host else "http")
     return f"{proto}://{host}/api/google/callback"
 
