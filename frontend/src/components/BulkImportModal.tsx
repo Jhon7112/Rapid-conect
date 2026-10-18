@@ -207,7 +207,7 @@ export const BulkImportModal: React.FC<BulkImportModalProps> = ({
     const worksheet = XLSX.utils.json_to_sheet(sampleData);
     const workbook = XLSX.utils.book_new();
     XLSX.utils.book_append_sheet(workbook, worksheet, 'Vendors');
-    XLSX.writeFile(workbook, 'Reacher_Vendor_Import_Template.xlsx');
+    XLSX.writeFile(workbook, 'Rapid_Conect_Vendor_Import_Template.xlsx');
   };
 
   const handleExecuteImport = async () => {
@@ -230,7 +230,7 @@ export const BulkImportModal: React.FC<BulkImportModalProps> = ({
           return {
             employee_name: getVal(row, columnMapping.employee_name),
             email_id: getVal(row, columnMapping.email_id),
-            company_name: getVal(row, columnMapping.company_name) || 'Reacher',
+            company_name: getVal(row, columnMapping.company_name) || 'Rapid Conect',
             contact_number: getVal(row, columnMapping.contact_number) || undefined,
             whatsapp_number: getVal(row, columnMapping.whatsapp_number) || undefined,
             job_title: getVal(row, columnMapping.job_title) || undefined,

@@ -174,7 +174,7 @@ export const VendorsPage: React.FC = () => {
 
     const timestamp = new Date().toISOString().slice(0, 10);
     const countLabel = selectedEmployees.length > 0 ? `${selectedEmployees.length}_Selected` : 'All';
-    const filename = `Reacher_Vendors_${countLabel}_${timestamp}.xlsx`;
+    const filename = `Rapid_Conect_Vendors_${countLabel}_${timestamp}.xlsx`;
 
     XLSX.writeFile(workbook, filename);
   };

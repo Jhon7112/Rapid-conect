@@ -1,7 +1,7 @@
 #!/bin/bash
 
 echo "========================================================"
-echo "           Starting Reacher Application...              "
+echo "        Starting Rapid Conect Application...            "
 echo "========================================================"
 
 cd "$(dirname "$0")"
@@ -26,7 +26,7 @@ elif command -v xdg-open > /dev/null; then
 fi
 
 echo "========================================================"
-echo "Reacher is running!"
+echo "Rapid Conect is running!"
 echo "  Frontend: http://localhost:5173/"
 echo "  Backend API: http://127.0.0.1:8000"
 echo "Press Ctrl+C to stop both servers."

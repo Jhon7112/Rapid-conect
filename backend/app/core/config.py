@@ -2,7 +2,7 @@ import os
 from pydantic_settings import BaseSettings
 
 class Settings(BaseSettings):
-    PROJECT_NAME: str = "Reacher API"
+    PROJECT_NAME: str = "Rapid Conect API"
     SECRET_KEY: str = os.getenv("SECRET_KEY", "super-secret-reacher-key-change-in-production-2026")
     ENCRYPTION_KEY: str = os.getenv("ENCRYPTION_KEY", "gX8mU_3-T10A8J_8kL8M_3-T10A8J_8kL8M_3-T10A8=")  # Base64 32-byte key for Fernet
     ALGORITHM: str = "HS256"

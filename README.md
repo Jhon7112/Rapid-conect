@@ -1,6 +1,6 @@
-# Reacher - Bulk Vendor Email & Outreach Management System
+# Rapid Conect - Bulk Vendor Email & Outreach Management System
 
-Reacher is a full-stack bulk email outreach platform designed for vendor management, email personalization, and delivery tracking powered by FastAPI, SQLite, React (Vite), and Gmail API.
+Rapid Conect is a full-stack bulk email outreach platform designed for vendor management, email personalization, and delivery tracking powered by FastAPI, PostgreSQL / Supabase, SQLite, React (Vite), and Gmail API.
 
 ---
 
@@ -8,8 +8,8 @@ Reacher is a full-stack bulk email outreach platform designed for vendor managem
 
 ### 1. Clone the Repository
 ```bash
-git clone https://github.com/Namratapandey2327/Reacher.git
-cd Reacher
+git clone https://github.com/Jhon7112/Rapid-conect.git
+cd Rapid_conect
 ```
 
 ### 2. One-Command Automated Setup (`setup`)

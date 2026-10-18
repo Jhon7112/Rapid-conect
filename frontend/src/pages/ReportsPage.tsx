@@ -96,7 +96,7 @@ export const ReportsPage: React.FC = () => {
     ];
 
     const timestamp = new Date().toISOString().slice(0, 10);
-    XLSX.writeFile(workbook, `Reacher_Vendor_Analytics_Report_${timestamp}.xlsx`);
+    XLSX.writeFile(workbook, `Rapid_Conect_Vendor_Analytics_Report_${timestamp}.xlsx`);
   };
 
   return (

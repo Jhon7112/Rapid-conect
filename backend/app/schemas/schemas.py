@@ -25,7 +25,7 @@ class UserResponse(BaseModel):
     name: str
     email: str
     role: str
-    company_name: Optional[str] = "Reacher"
+    company_name: Optional[str] = "Rapid Conect"
     official_email: Optional[str] = None
     company_logo: Optional[str] = None
     is_active: bool

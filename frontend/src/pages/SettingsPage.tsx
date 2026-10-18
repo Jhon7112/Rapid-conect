@@ -24,7 +24,7 @@ export const SettingsPage: React.FC = () => {
     if (user) {
       setName(user.name || '');
       setRole(user.role || '');
-      setCompanyName(user.company_name || 'Reacher');
+      setCompanyName(user.company_name || 'Rapid Conect');
       setEmail(user.email || '');
       setOfficialEmail(user.official_email || user.email || '');
       setCompanyLogo(user.company_logo || '');
@@ -285,7 +285,7 @@ export const SettingsPage: React.FC = () => {
                 required
                 value={companyName}
                 onChange={(e) => { setCompanyName(e.target.value); setProfileSuccessMsg(''); }}
-                placeholder="e.g. Reacher"
+                placeholder="e.g. Rapid Conect"
                 className="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-lg text-sm text-slate-900 font-medium focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-colors"
               />
               <span className="text-[10px] text-slate-400 mt-1 block">Used in recruiter intro text</span>

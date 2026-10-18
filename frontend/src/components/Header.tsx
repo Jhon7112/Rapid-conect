@@ -36,7 +36,7 @@ export const Header: React.FC = () => {
               navigate('/login');
             }}
             className="text-[11px] font-semibold text-slate-500 hover:text-rose-600 px-2 py-1 hover:bg-rose-50 rounded transition-colors ml-1"
-            title="Sign out of Reacher"
+            title="Sign out of Rapid Conect"
           >
             Logout
           </button>

@@ -78,7 +78,7 @@ class CampaignService:
 
         user = db.query(User).filter(User.id == campaign.user_id).first()
         recruiter_name = user.name if user else "Recruiter"
-        recruiter_company = (user.company_name if (user and hasattr(user, 'company_name') and user.company_name) else "Reacher")
+        recruiter_company = (user.company_name if (user and hasattr(user, 'company_name') and user.company_name) else "Rapid Conect")
 
         recipients = db.query(CampaignRecipient).filter(
             CampaignRecipient.campaign_id == campaign_id,

@@ -2,7 +2,7 @@
 set -e
 
 echo "========================================================"
-echo "           Setting up Reacher Project...                "
+echo "        Setting up Rapid Conect Project...              "
 echo "========================================================"
 
 echo "[1/4] Setting up Python backend virtual environment..."
@@ -35,7 +35,7 @@ npm install
 cd "$(dirname "$0")"
 
 echo "========================================================"
-echo "      Reacher Setup Completed Successfully!             "
+echo "    Rapid Conect Setup Completed Successfully!          "
 echo "========================================================"
 echo "You can now start the application by running:"
 echo "  ./run.sh"

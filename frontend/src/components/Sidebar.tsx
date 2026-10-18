@@ -33,12 +33,12 @@ export const Sidebar: React.FC = () => {
       {/* Brand Header */}
       <div className="h-16 px-6 flex items-center justify-between border-b border-slate-800/80 bg-slate-950/40">
         <div className="flex items-center gap-3">
-          <div className="w-9 h-9 rounded-lg bg-gradient-to-tr from-blue-600 to-indigo-500 flex items-center justify-center shadow-lg shadow-indigo-500/20 text-white font-bold text-lg">
-            R
+          <div className="w-9 h-9 rounded-lg bg-gradient-to-tr from-blue-600 to-indigo-500 flex items-center justify-center shadow-lg shadow-indigo-500/20 text-white font-bold text-sm tracking-tighter">
+            RC
           </div>
           <div>
-            <h1 className="font-semibold text-white tracking-wide text-base leading-none">Reacher</h1>
-            <span className="text-[11px] text-slate-400 font-medium">Vendor Platform</span>
+            <h1 className="font-semibold text-white tracking-wide text-base leading-none">Rapid Conect</h1>
+            <span className="text-[11px] text-slate-400 font-medium">Outreach Platform</span>
           </div>
         </div>
       </div>

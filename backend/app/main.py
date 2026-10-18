@@ -40,7 +40,7 @@ def startup_db_seed():
     try:
         with engine.connect() as conn:
             for col_sql in [
-                "ALTER TABLE users ADD COLUMN company_name VARCHAR DEFAULT 'Reacher'",
+                "ALTER TABLE users ADD COLUMN company_name VARCHAR DEFAULT 'Rapid Conect'",
                 "ALTER TABLE users ADD COLUMN official_email VARCHAR",
                 "ALTER TABLE users ADD COLUMN company_logo TEXT"
             ]:
@@ -62,7 +62,7 @@ def startup_db_seed():
                 email="namratapandey2327@gmail.com",
                 hashed_password=hash_password("reacher123"),
                 role="Senior Vendor Procurement Lead",
-                company_name="Reacher"
+                company_name="Rapid Conect"
             )
             db.add(demo_user)
 
@@ -71,7 +71,7 @@ def startup_db_seed():
                 email="recruiter.demo@gmail.com",
                 hashed_password=hash_password("reacher123"),
                 role="Senior Technical Recruiter",
-                company_name="Reacher"
+                company_name="Rapid Conect"
             )
             db.add(demo_recruiter)
             db.commit()
@@ -126,7 +126,7 @@ def health_check():
     
     return {
         "status": "ok",
-        "app": "Reacher API",
+        "app": "Rapid Conect API",
         "database_status": db_status,
         "database_type": "postgresql" if "postgres" in settings.DATABASE_URL else "sqlite",
         "error": db_err

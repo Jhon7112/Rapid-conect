@@ -85,10 +85,10 @@ export const LoginPage: React.FC = () => {
       <div className="w-full max-w-md bg-slate-900 border border-slate-800 rounded-2xl p-8 shadow-2xl space-y-6 relative z-10">
         {/* Header */}
         <div className="text-center space-y-2">
-          <div className="w-12 h-12 rounded-xl bg-gradient-to-tr from-blue-600 to-indigo-500 flex items-center justify-center mx-auto shadow-lg shadow-indigo-500/30 text-white font-bold text-xl">
-            R
+          <div className="w-12 h-12 rounded-xl bg-gradient-to-tr from-blue-600 to-indigo-500 flex items-center justify-center mx-auto shadow-lg shadow-indigo-500/30 text-white font-bold text-lg tracking-tighter">
+            RC
           </div>
-          <h1 className="text-2xl font-bold tracking-tight text-white">Reacher Platform</h1>
+          <h1 className="text-2xl font-bold tracking-tight text-white">Rapid Conect</h1>
           <p className="text-xs text-slate-400">Recruiter Bulk Email & Candidate Outreach System</p>
         </div>
 
@@ -172,7 +172,7 @@ export const LoginPage: React.FC = () => {
             className="w-full py-2.5 bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-semibold rounded-xl shadow-lg shadow-indigo-600/30 transition-all flex items-center justify-center gap-2"
           >
             <LogIn className="w-4 h-4" />
-            <span>{loading ? 'Authenticating...' : 'Sign In to Reacher'}</span>
+            <span>{loading ? 'Authenticating...' : 'Sign In to Rapid Conect'}</span>
           </button>
         </form>
 
