@@ -16,7 +16,7 @@ class User(Base):
     hashed_password = Column(String, nullable=True)
     google_user_id = Column(String, nullable=True)
     role = Column(String, default="recruiter")
-    company_name = Column(String, default="Reacher", nullable=True)
+    company_name = Column(String, default="Rapid Conect", nullable=True)
     official_email = Column(String, nullable=True)
     company_logo = Column(Text, nullable=True)
     is_active = Column(Boolean, default=True)
