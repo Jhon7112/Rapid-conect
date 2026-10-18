@@ -51,11 +51,22 @@ def get_request_redirect_uri(request: Request) -> str:
     return f"{proto}://{host}/api/google/callback"
 
 def get_request_frontend_url(request: Request) -> str:
-    if settings.FRONTEND_URL and "localhost" not in settings.FRONTEND_URL:
+    # 1. On Vercel serverless / cloud deployments
+    import os
+    vercel_host = os.getenv("VERCEL_PROJECT_PRODUCTION_URL") or os.getenv("VERCEL_URL")
+    if vercel_host:
+        return f"https://{vercel_host}".rstrip('/')
+
+    forwarded_host = request.headers.get("x-forwarded-host")
+    if forwarded_host and "vercel.app" in forwarded_host:
+        proto = request.headers.get("x-forwarded-proto", "https")
+        return f"{proto}://{forwarded_host}".rstrip('/')
+
+    # 2. Prefer explicitly configured FRONTEND_URL or effective_frontend_url
+    if settings.FRONTEND_URL:
         return settings.FRONTEND_URL.rstrip('/')
-    host = request.headers.get("x-forwarded-host") or request.headers.get("host") or "rapid-conect.vercel.app"
-    proto = request.headers.get("x-forwarded-proto", "https" if "vercel.app" in host else "http")
-    return f"{proto}://{host}"
+
+    return settings.effective_frontend_url.rstrip('/')
 
 @router.get("/connect")
 def connect_google(

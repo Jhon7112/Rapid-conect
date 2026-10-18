@@ -1,4 +1,5 @@
-from fastapi import FastAPI
+from fastapi import FastAPI, Request
+from fastapi.responses import RedirectResponse
 from fastapi.middleware.cors import CORSMiddleware
 from sqlalchemy import text
 from app.core.config import settings
@@ -28,6 +29,16 @@ app.include_router(employees.router, prefix="/api")
 app.include_router(campaigns.router, prefix="/api")
 app.include_router(templates.router, prefix="/api")
 app.include_router(logo.router, prefix="/api")
+
+@app.get("/")
+def root_redirect(request: Request):
+    """
+    Redirects root requests to the Vite frontend (http://localhost:5173 on local),
+    forwarding all query parameters like ?connected=true&token=... seamlessly.
+    """
+    qs = f"?{request.query_params}" if request.query_params else ""
+    frontend_base = settings.effective_frontend_url.rstrip('/')
+    return RedirectResponse(url=f"{frontend_base}/{qs}")
 
 @app.on_event("startup")
 def startup_db_seed():

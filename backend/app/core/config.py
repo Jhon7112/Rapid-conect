@@ -29,12 +29,10 @@ class Settings(BaseSettings):
 
     @property
     def effective_frontend_url(self) -> str:
-        if self.FRONTEND_URL and "localhost" not in self.FRONTEND_URL:
-            return self.FRONTEND_URL
         vercel_host = os.getenv("VERCEL_PROJECT_PRODUCTION_URL") or os.getenv("VERCEL_URL")
         if vercel_host:
             return f"https://{vercel_host}"
-        return self.FRONTEND_URL
+        return self.FRONTEND_URL or "http://localhost:5173"
 
     class Config:
         env_file = ".env"
