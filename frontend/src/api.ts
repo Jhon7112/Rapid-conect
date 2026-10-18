@@ -137,10 +137,15 @@ export async function fetchGoogleStatus(): Promise<GoogleStatus> {
   return resp.json();
 }
 
-export async function connectGoogle(): Promise<string> {
-  const resp = await fetch(`${API_BASE}/google/connect`, {
+export async function connectGoogle(state: string = ''): Promise<string> {
+  const query = state ? `?state=${encodeURIComponent(state)}` : '';
+  const resp = await fetch(`${API_BASE}/google/connect${query}`, {
     headers: getAuthHeaders()
   });
+  if (!resp.ok) {
+    const err = await resp.json().catch(() => ({}));
+    throw new Error(err.detail || 'Google authentication is currently unavailable');
+  }
   const data = await resp.json();
   return data.auth_url;
 }

@@ -145,12 +145,14 @@ def google_callback(
         token = create_access_token({"sub": user.id, "email": user.email})
 
         logger.info(f"[Google OAuth Callback] Successfully authorized and linked Google account for: {google_email}")
-        return RedirectResponse(url=f"{frontend_url}/settings?connected=true&token={token}", status_code=302)
+        target_path = "/" if state in ("login", "") else "/settings"
+        return RedirectResponse(url=f"{frontend_url}{target_path}?connected=true&token={token}", status_code=302)
 
     except Exception as exc:
         logger.exception(f"[Google OAuth Callback Exception] {exc}")
         safe_msg = urllib.parse.quote(str(exc))
-        return RedirectResponse(url=f"{frontend_url}/settings?google_error={safe_msg}", status_code=302)
+        target_path = "/login" if state == "login" else "/settings"
+        return RedirectResponse(url=f"{frontend_url}{target_path}?google_error={safe_msg}", status_code=302)
 
 @router.post("/disconnect")
 def disconnect_google(current_user: User = Depends(get_current_user), db: Session = Depends(get_db)):
