@@ -34,24 +34,12 @@ def get_optional_current_user(db: Session = Depends(get_db), token: str = Depend
     except Exception:
         return None
 
-@router.post("/register", response_model=TokenResponse)
-def register(user_in: UserCreate, db: Session = Depends(get_db)):
-    existing = db.query(User).filter(User.email == user_in.email).first()
-    if existing:
-        raise HTTPException(status_code=400, detail="Email already registered")
-
-    user = User(
-        name=user_in.name,
-        email=user_in.email,
-        hashed_password=hash_password(user_in.password),
-        role="recruiter"
+@router.post("/register")
+def register():
+    raise HTTPException(
+        status_code=status.HTTP_403_FORBIDDEN,
+        detail="Standard registration is disabled. Rapid Conect exclusively authenticates via Google Sign-In."
     )
-    db.add(user)
-    db.commit()
-    db.refresh(user)
-
-    token = create_access_token({"sub": user.id, "email": user.email})
-    return {"access_token": token, "token_type": "bearer", "user": user}
 
 @router.post("/login", response_model=TokenResponse)
 def login(user_in: UserLogin, db: Session = Depends(get_db)):

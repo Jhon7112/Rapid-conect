@@ -100,15 +100,22 @@ class GmailService:
 
         logger = logging.getLogger(__name__)
 
-        message = MIMEMultipart("related")
-        message["From"] = sender_email
-        message["To"] = to_email
-        message["Subject"] = subject
+        # Prevent CRLF header injection
+        clean_from = sender_email.replace("\r", "").replace("\n", "").strip()
+        clean_to = to_email.replace("\r", "").replace("\n", "").strip()
+        clean_subject = subject.replace("\r", " ").replace("\n", " ").strip()
+        clean_cc = cc.replace("\r", "").replace("\n", "").strip() if cc else None
+        clean_bcc = bcc.replace("\r", "").replace("\n", "").strip() if bcc else None
 
-        if cc:
-            message["Cc"] = cc
-        if bcc:
-            message["Bcc"] = bcc
+        message = MIMEMultipart("related")
+        message["From"] = clean_from
+        message["To"] = clean_to
+        message["Subject"] = clean_subject
+
+        if clean_cc:
+            message["Cc"] = clean_cc
+        if clean_bcc:
+            message["Bcc"] = clean_bcc
 
         has_company_logo = bool(company_logo and company_logo.strip())
         logo_len = len(company_logo) if has_company_logo else 0

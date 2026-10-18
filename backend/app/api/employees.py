@@ -61,6 +61,12 @@ def bulk_import_employees(
     db: Session = Depends(get_db),
     current_user: User = Depends(get_current_user)
 ):
+    if len(employees_in) > 500:
+        raise HTTPException(
+            status_code=400,
+            detail="Batch size limit exceeded. Maximum 500 candidates permitted per import batch."
+        )
+
     imported_count = 0
     duplicate_count = 0
     for emp_data in employees_in:
@@ -205,7 +211,9 @@ def create_employee(
         return emp
     except Exception as e:
         db.rollback()
-        raise HTTPException(status_code=500, detail=f"Database error creating vendor: {str(e)}")
+        import logging
+        logging.getLogger(__name__).error(f"[Create Vendor] Database error: {e}")
+        raise HTTPException(status_code=500, detail="Database error occurred while creating vendor record.")
 
 @router.get("/{employee_id}", response_model=EmployeeResponse)
 def get_employee(employee_id: str, db: Session = Depends(get_db), current_user: User = Depends(get_current_user)):

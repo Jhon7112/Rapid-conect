@@ -110,9 +110,41 @@ class LogoService:
 
     @classmethod
     def _fetch_and_process_url(cls, url: str) -> Dict[str, Any]:
+        import socket
+        import ipaddress
+        from urllib.parse import urlparse
+
         try:
-            resp = httpx.get(url, timeout=5.0, follow_redirects=True)
+            parsed = urlparse(url)
+            if parsed.scheme not in ("http", "https"):
+                logger.warning(f"[LogoService] Blocked disallowed scheme: {parsed.scheme}")
+                return cls._generate_fallback_logo("VENDOR")
+
+            hostname = parsed.hostname
+            if not hostname or hostname in ("localhost", "0.0.0.0", "127.0.0.1", "::1", "169.254.169.254"):
+                logger.warning(f"[LogoService] Blocked loopback/metadata host: {hostname}")
+                return cls._generate_fallback_logo("VENDOR")
+
+            try:
+                ip_str = socket.gethostbyname(hostname)
+                ip = ipaddress.ip_address(ip_str)
+                if ip.is_private or ip.is_loopback or ip.is_link_local or ip.is_reserved:
+                    logger.warning(f"[LogoService] Blocked private IP: {ip} for {hostname}")
+                    return cls._generate_fallback_logo("VENDOR")
+            except Exception:
+                pass
+
+            resp = httpx.get(
+                url,
+                timeout=5.0,
+                follow_redirects=True,
+                headers={"User-Agent": "RapidConect-LogoProxy/1.0"}
+            )
             if resp.status_code == 200:
+                if len(resp.content) > 5 * 1024 * 1024:
+                    logger.warning("[LogoService] Remote image exceeds 5MB limit.")
+                    return cls._generate_fallback_logo("VENDOR")
+
                 content_type = resp.headers.get("content-type", "").lower()
                 if "svg" in content_type:
                     return cls._convert_svg_to_png(resp.text)

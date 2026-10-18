@@ -14,14 +14,47 @@ app = FastAPI(
     version="1.0.0"
 )
 
-# CORS setup for Vite frontend
+# Allowed CORS origins for local development and production
+allowed_origins = [
+    "http://localhost:5173",
+    "http://127.0.0.1:5173",
+    "http://localhost:3000",
+    "http://localhost:8000",
+    "https://rapid-conect.vercel.app",
+]
+if settings.FRONTEND_URL and settings.FRONTEND_URL not in allowed_origins:
+    allowed_origins.append(settings.FRONTEND_URL.rstrip('/'))
+
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],
+    allow_origins=allowed_origins,
+    allow_origin_regex=r"^https://rapid-conect(-[a-z0-9-]+)?\.vercel\.app$",
     allow_credentials=True,
-    allow_methods=["*"],
+    allow_methods=["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
     allow_headers=["*"],
 )
+
+class SecurityHeadersMiddleware:
+    def __init__(self, app):
+        self.app = app
+
+    async def __call__(self, scope, receive, send):
+        if scope["type"] != "http":
+            return await self.app(scope, receive, send)
+
+        async def send_wrapper(message):
+            if message["type"] == "http.response.start":
+                headers = list(message.get("headers", []))
+                headers.append((b"x-content-type-options", b"nosniff"))
+                headers.append((b"x-frame-options", b"SAMEORIGIN"))
+                headers.append((b"x-xss-protection", b"1; mode=block"))
+                headers.append((b"referrer-policy", b"strict-origin-when-cross-origin"))
+                message["headers"] = headers
+            await send(message)
+
+        await self.app(scope, receive, send_wrapper)
+
+app.add_middleware(SecurityHeadersMiddleware)
 
 app.include_router(auth.router, prefix="/api")
 app.include_router(google.router, prefix="/api")
@@ -93,19 +126,18 @@ def startup_db_seed():
 @app.get("/api/health")
 def health_check():
     db_status = "unknown"
-    db_err = None
     try:
         with engine.connect() as conn:
             conn.execute(text("SELECT 1"))
         db_status = "connected"
     except Exception as e:
-        db_status = "failed"
-        db_err = str(e)
+        import logging
+        logging.getLogger(__name__).error(f"[Health Check] Database probe failed: {e}")
+        db_status = "disconnected"
     
     return {
-        "status": "ok",
+        "status": "ok" if db_status == "connected" else "degraded",
         "app": "Rapid Conect API",
         "database_status": db_status,
-        "database_type": "postgresql" if "postgres" in settings.DATABASE_URL else "sqlite",
-        "error": db_err
+        "database_type": "postgresql" if "postgres" in settings.DATABASE_URL else "sqlite"
     }
