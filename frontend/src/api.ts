@@ -10,54 +10,28 @@ function getAuthHeaders() {
   };
 }
 
-export async function fetchCurrentUser(): Promise<{ token: string; user: User }> {
-  let token = localStorage.getItem('reacher_token');
-  
-  // If no token exists, perform auto demo login
+export async function fetchCurrentUser(): Promise<{ token: string; user: User } | null> {
+  const token = localStorage.getItem('reacher_token');
   if (!token) {
-    const resp = await fetch(`${API_BASE}/auth/login`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        email: 'namratapandey2327@gmail.com',
-        password: 'reacher123'
-      })
+    return null;
+  }
+
+  try {
+    const meResp = await fetch(`${API_BASE}/auth/me`, {
+      headers: getAuthHeaders()
     });
-    
-    if (!resp.ok) {
-      // Register default user
-      const regResp = await fetch(`${API_BASE}/auth/register`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          name: 'Namrata Pandey',
-          email: 'namratapandey2327@gmail.com',
-          password: 'reacher123'
-        })
-      });
-      const regData = await regResp.json();
-      const validToken: string = regData.access_token;
-      localStorage.setItem('reacher_token', validToken);
-      return { token: validToken, user: regData.user };
+
+    if (!meResp.ok) {
+      localStorage.removeItem('reacher_token');
+      return null;
     }
-    
-    const data = await resp.json();
-    const validToken: string = data.access_token;
-    localStorage.setItem('reacher_token', validToken);
-    return { token: validToken, user: data.user };
+
+    const user = await meResp.json();
+    return { token, user };
+  } catch (err) {
+    console.error('Error validating auth session:', err);
+    return null;
   }
-
-  const meResp = await fetch(`${API_BASE}/auth/me`, {
-    headers: getAuthHeaders()
-  });
-
-  if (!meResp.ok) {
-    localStorage.removeItem('reacher_token');
-    return fetchCurrentUser();
-  }
-
-  const user = await meResp.json();
-  return { token: token!, user };
 }
 
 export async function fetchEmployees(params?: {

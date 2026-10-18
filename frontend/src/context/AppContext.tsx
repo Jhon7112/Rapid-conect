@@ -16,6 +16,7 @@ Scope of Services:
 
 interface AppContextType {
   user: User | null;
+  authLoading: boolean;
   selectedEmployees: Employee[];
   googleStatus: GoogleStatus;
   campaignDraft: CampaignDraft;
@@ -33,12 +34,13 @@ const AppContext = createContext<AppContextType | undefined>(undefined);
 
 export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [user, setUser] = useState<User | null>(null);
+  const [authLoading, setAuthLoading] = useState<boolean>(true);
   const [selectedEmployees, setSelectedEmployees] = useState<Employee[]>([]);
   const [googleStatus, setGoogleStatus] = useState<GoogleStatus>({
-    connected: true,
-    google_email: 'recruiter.demo@gmail.com',
-    account_id: 'demo',
-    status: 'connected'
+    connected: false,
+    google_email: null,
+    account_id: null,
+    status: 'disconnected'
   });
   const [campaignDraft, setCampaignDraft] = useState<CampaignDraft>(DEFAULT_CAMPAIGN_DRAFT);
 
@@ -48,10 +50,10 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
 
   const refreshCurrentUser = async () => {
     try {
-      const { user: fetchedUser } = await fetchCurrentUser();
-      setUser(fetchedUser);
+      const res = await fetchCurrentUser();
+      setUser(res ? res.user : null);
     } catch (e) {
-      console.error(e);
+      setUser(null);
     }
   };
 
@@ -62,8 +64,13 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
       localStorage.setItem('reacher_token', tokenFromUrl);
     }
 
-    refreshCurrentUser();
-    refreshGoogleStatus();
+    const init = async () => {
+      setAuthLoading(true);
+      await refreshCurrentUser();
+      await refreshGoogleStatus();
+      setAuthLoading(false);
+    };
+    init();
   }, []);
 
   const refreshGoogleStatus = async () => {
@@ -115,6 +122,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     <AppContext.Provider
       value={{
         user,
+        authLoading,
         selectedEmployees,
         googleStatus,
         campaignDraft,
