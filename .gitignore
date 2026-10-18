@@ -1,0 +1,37 @@
+# Secrets & Environment Variables (NEVER commit to git)
+.env
+*.env
+.env.local
+.env.development.local
+.env.production.local
+
+# Python Virtual Environments & Cache
+__pycache__/
+*.py[cod]
+*$py.class
+venv/
+.venv/
+env/
+# Database Files (Local only - NEVER commit to git)
+*.db
+*.sqlite
+*.sqlite3
+backend/reacher.db
+reacher.db
+
+# Node Dependencies & Build Outputs
+node_modules/
+dist/
+dist-ssr/
+build/
+.output/
+
+# Temporary & Scratch Files
+*.timestamp-*.mjs
+scratch_*.py
+
+# IDE & OS files
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
