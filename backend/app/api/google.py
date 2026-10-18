@@ -7,6 +7,7 @@ from app.core.security import create_access_token
 from app.api.auth import get_current_user, get_optional_current_user
 from app.models.models import User, GoogleAccount
 from app.services.gmail_service import GmailService
+from app.core.config import settings
 
 router = APIRouter(prefix="/google", tags=["Google OAuth"])
 
@@ -45,14 +46,14 @@ def get_request_redirect_uri(request: Request) -> str:
         return settings.GOOGLE_REDIRECT_URI
 
     # Infer from incoming request headers
-    host = request.headers.get("x-forwarded-host") or request.headers.get("host") or "reacher-tan-eight.vercel.app"
+    host = request.headers.get("x-forwarded-host") or request.headers.get("host") or "rapid-conect.vercel.app"
     proto = request.headers.get("x-forwarded-proto", "https" if "vercel.app" in host else "http")
     return f"{proto}://{host}/api/google/callback"
 
 def get_request_frontend_url(request: Request) -> str:
     if settings.FRONTEND_URL and "localhost" not in settings.FRONTEND_URL:
         return settings.FRONTEND_URL.rstrip('/')
-    host = request.headers.get("x-forwarded-host") or request.headers.get("host") or "reacher-tan-eight.vercel.app"
+    host = request.headers.get("x-forwarded-host") or request.headers.get("host") or "rapid-conect.vercel.app"
     proto = request.headers.get("x-forwarded-proto", "https" if "vercel.app" in host else "http")
     return f"{proto}://{host}"
 
